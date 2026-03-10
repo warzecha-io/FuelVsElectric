@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benzin vs. Strom – 100 km Kostenvergleich</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f3f6fb;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent-left: #ef4444;
+        --accent-right: #10b981;
+        --ring: #e5e7eb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: radial-gradient(circle at top, #ffffff, var(--bg));
+        color: var(--text);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .app {
+        width: min(980px, 100%);
+        background: var(--panel);
+        border: 1px solid var(--ring);
+        border-radius: 20px;
+        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        text-align: center;
+        font-size: clamp(1.4rem, 2.6vw, 2rem);
+      }
+
+      .subtitle {
+        text-align: center;
+        color: var(--muted);
+        margin: 0 0 24px;
+      }
+
+      .inputs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+
+      .field {
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      .field label {
+        display: block;
+        font-weight: 650;
+        margin-bottom: 8px;
+      }
+
+      .field input {
+        width: 100%;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 1rem;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        border: 1px solid var(--ring);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.05rem;
+      }
+
+      .wheel {
+        margin-top: 14px;
+        aspect-ratio: 1 / 1;
+        width: min(280px, 100%);
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        margin-inline: auto;
+      }
+
+      .wheel.left {
+        background: radial-gradient(circle, #fff 55%, rgba(239, 68, 68, 0.18) 56%, rgba(239, 68, 68, 0.32) 100%);
+      }
+
+      .wheel.right {
+        background: radial-gradient(circle, #fff 55%, rgba(16, 185, 129, 0.18) 56%, rgba(16, 185, 129, 0.32) 100%);
+      }
+
+      .price-control {
+        text-align: center;
+      }
+
+      .price-control input[type='range'] {
+        width: 88%;
+      }
+
+      .price {
+        margin-top: 8px;
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      .hint {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.88rem;
+        text-align: center;
+      }
+
+      .result {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid var(--ring);
+        text-align: center;
+        font-weight: 600;
+      }
+
+      @media (max-width: 760px) {
+        .inputs,
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <h1>Kostenvergleich pro 100 km</h1>
+      <p class="subtitle">Links Benzin, rechts Strom – die Preise bleiben immer äquivalent.</p>
+
+      <section class="inputs">
+        <div class="field">
+          <label for="fuelConsumption">Benzinverbrauch (Liter / 100 km)</label>
+          <input id="fuelConsumption" type="number" min="0" step="0.1" value="9" />
+        </div>
+        <div class="field">
+          <label for="electricConsumption">Stromverbrauch (kWh / 100 km)</label>
+          <input id="electricConsumption" type="number" min="0" step="0.1" value="24" />
+        </div>
+      </section>
+
+      <section class="cards">
+        <article class="card">
+          <h2>⛽ Benzinpreis</h2>
+          <div class="wheel left">
+            <div class="price-control">
+              <input id="fuelPrice" type="range" min="0.80" max="3.00" step="0.01" value="1.70" />
+              <div class="price"><span id="fuelPriceLabel">1,70</span> € / Liter</div>
+            </div>
+          </div>
+          <p class="hint">Wenn du hier drehst, passt sich der Strompreis an.</p>
+        </article>
+
+        <article class="card">
+          <h2>⚡ Strompreis</h2>
+          <div class="wheel right">
+            <div class="price-control">
+              <input id="electricPrice" type="range" min="0.05" max="1.20" step="0.001" value="0.638" />
+              <div class="price"><span id="electricPriceLabel">0,638</span> € / kWh</div>
+            </div>
+          </div>
+          <p class="hint">Wenn du hier drehst, passt sich der Benzinpreis an.</p>
+        </article>
+      </section>
+
+      <div class="result" id="result"></div>
+    </main>
+
+    <script>
+      const fuelConsumptionEl = document.getElementById('fuelConsumption');
+      const electricConsumptionEl = document.getElementById('electricConsumption');
+      const fuelPriceEl = document.getElementById('fuelPrice');
+      const electricPriceEl = document.getElementById('electricPrice');
+
+      const fuelPriceLabel = document.getElementById('fuelPriceLabel');
+      const electricPriceLabel = document.getElementById('electricPriceLabel');
+      const resultEl = document.getElementById('result');
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const toNumber = (value, fallback) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+      };
+
+      const format = (num, digits = 2) =>
+        num.toLocaleString('de-DE', {
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        });
+
+      function updateFromFuel() {
+        const fuelConsumption = toNumber(fuelConsumptionEl.value, 9);
+        const electricConsumption = toNumber(electricConsumptionEl.value, 24);
+        const fuelPrice = toNumber(fuelPriceEl.value, 1.7);
+
+        const costPer100Fuel = fuelConsumption * fuelPrice;
+        const equivalentElectricPrice =
+          electricConsumption > 0 ? costPer100Fuel / electricConsumption : 0;
+
+        const clamped = clamp(
+          equivalentElectricPrice,
+          Number(electricPriceEl.min),
+          Number(electricPriceEl.max),
+        );
+
+        electricPriceEl.value = clamped;
+        render();
+      }
+
+      function updateFromElectric() {
+        const fuelConsumption = toNumber(fuelConsumptionEl.value, 9);
+        const electricConsumption = toNumber(electricConsumptionEl.value, 24);
+        const electricPrice = toNumber(electricPriceEl.value, 0.638);
+
+        const costPer100Electric = electricConsumption * electricPrice;
+        const equivalentFuelPrice =
+          fuelConsumption > 0 ? costPer100Electric / fuelConsumption : 0;
+
+        const clamped = clamp(
+          equivalentFuelPrice,
+          Number(fuelPriceEl.min),
+          Number(fuelPriceEl.max),
+        );
+
+        fuelPriceEl.value = clamped;
+        render();
+      }
+
+      function render() {
+        const fuelConsumption = toNumber(fuelConsumptionEl.value, 9);
+        const electricConsumption = toNumber(electricConsumptionEl.value, 24);
+        const fuelPrice = toNumber(fuelPriceEl.value, 1.7);
+        const electricPrice = toNumber(electricPriceEl.value, 0.638);
+
+        const costFuel = fuelConsumption * fuelPrice;
+        const costElectric = electricConsumption * electricPrice;
+
+        fuelPriceLabel.textContent = format(fuelPrice, 2);
+        electricPriceLabel.textContent = format(electricPrice, 3);
+        resultEl.textContent = `Kosten pro 100 km: Benzin ${format(costFuel, 2)} € = Strom ${format(
+          costElectric,
+          2,
+        )} €`;
+      }
+
+      fuelPriceEl.addEventListener('input', updateFromFuel);
+      electricPriceEl.addEventListener('input', updateFromElectric);
+
+      fuelConsumptionEl.addEventListener('input', updateFromFuel);
+      electricConsumptionEl.addEventListener('input', updateFromFuel);
+
+      updateFromFuel();
+    </script>
+  </body>
+</html>
