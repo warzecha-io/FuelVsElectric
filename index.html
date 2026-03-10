@@ -74,12 +74,20 @@
       <section class="mt-6 grid gap-4 sm:grid-cols-2">
         <label class="rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
           <span class="mb-2 block text-xl font-semibold text-slate-200">Benzin-Verbrauch (Liter / 100 km)</span>
-          <input id="fuelConsumption" type="number" min="0" step="0.1" value="9" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-3 text-2xl outline-none focus:border-blue-400" />
+          <div class="flex items-center gap-3">
+            <button type="button" id="fuelMinus" class="h-14 w-14 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95">−</button>
+            <input id="fuelConsumption" type="number" min="0" step="0.1" value="9" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-3 text-center text-2xl outline-none focus:border-blue-400" />
+            <button type="button" id="fuelPlus" class="h-14 w-14 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95">+</button>
+          </div>
         </label>
 
         <label class="rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
           <span class="mb-2 block text-xl font-semibold text-slate-200">Stromverbrauch (kWh / 100 km)</span>
-          <input id="electricConsumption" type="number" min="0" step="0.1" value="24" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-3 text-2xl outline-none focus:border-emerald-400" />
+          <div class="flex items-center gap-3">
+            <button type="button" id="electricMinus" class="h-14 w-14 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95">−</button>
+            <input id="electricConsumption" type="number" min="0" step="0.01" value="24" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-4 py-3 text-center text-2xl outline-none focus:border-emerald-400" />
+            <button type="button" id="electricPlus" class="h-14 w-14 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95">+</button>
+          </div>
         </label>
       </section>
 
@@ -127,6 +135,10 @@
       const electricPriceEl = document.getElementById('electricPrice');
       const fuelPriceLabel = document.getElementById('fuelPriceLabel');
       const electricPriceLabel = document.getElementById('electricPriceLabel');
+      const fuelMinusEl = document.getElementById('fuelMinus');
+      const fuelPlusEl = document.getElementById('fuelPlus');
+      const electricMinusEl = document.getElementById('electricMinus');
+      const electricPlusEl = document.getElementById('electricPlus');
       const fuelWheel = document.getElementById('fuelWheel');
       const electricWheel = document.getElementById('electricWheel');
       const fuelMarker = document.getElementById('fuelMarker');
@@ -139,6 +151,13 @@
       };
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
       const format = (num, digits) => num.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
+      function adjustNumberInput(inputEl, delta, digits) {
+        const current = toNumber(inputEl.value, 0);
+        const next = Math.max(0, current + delta);
+        inputEl.value = next.toFixed(digits);
+        updateFromFuel();
+      }
 
       function positionMarker(markerEl, wheelEl, rangeEl) {
         const value = Number(rangeEl.value);
@@ -203,7 +222,7 @@
         const costFuel = fuelConsumption * fuelPrice;
         const costElectric = electricConsumption * electricPrice;
 
-        resultEl.textContent = `${format(fuelPrice, 2)} € / Liter bei ${format(fuelConsumption, 1)} l/100 km entspricht ${format(electricPrice, 3)} € / kWh bei ${format(electricConsumption, 1)} kWh/100 km. Kosten je 100 km: ${format(costFuel, 2)} €.`;
+        resultEl.textContent = `${format(fuelPrice, 2)} € / Liter bei ${format(fuelConsumption, 1)} l/100 km entspricht ${format(electricPrice, 3)} € / kWh bei ${format(electricConsumption, 2)} kWh/100 km. Kosten je 100 km: ${format(costFuel, 2)} €.`;
 
         positionMarker(fuelMarker, fuelWheel, fuelPriceEl);
         positionMarker(electricMarker, electricWheel, electricPriceEl);
@@ -231,6 +250,10 @@
 
       fuelConsumptionEl.addEventListener('input', updateFromFuel);
       electricConsumptionEl.addEventListener('input', updateFromFuel);
+      fuelMinusEl.addEventListener('click', () => adjustNumberInput(fuelConsumptionEl, -0.1, 1));
+      fuelPlusEl.addEventListener('click', () => adjustNumberInput(fuelConsumptionEl, 0.1, 1));
+      electricMinusEl.addEventListener('click', () => adjustNumberInput(electricConsumptionEl, -0.01, 2));
+      electricPlusEl.addEventListener('click', () => adjustNumberInput(electricConsumptionEl, 0.01, 2));
       fuelPriceEl.addEventListener('input', updateFromFuel);
       electricPriceEl.addEventListener('input', updateFromElectric);
       window.addEventListener('resize', render);
