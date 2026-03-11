@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fuelvselectric – 100 km Kostenvergleich</title>
+    <title>fuelvselectric – 100 km Vergleich</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       .app-bg {
@@ -12,7 +12,7 @@
 
       .wheel-shell {
         position: relative;
-        width: min(100%, 320px);
+        width: min(100%, 300px);
         aspect-ratio: 1 / 1;
         margin-inline: auto;
         border-radius: 9999px;
@@ -21,26 +21,21 @@
         user-select: none;
       }
 
-      .wheel-shell:active {
-        cursor: grabbing;
-      }
-
       .wheel-ring {
         position: absolute;
         inset: 0;
         border-radius: 9999px;
-        border: 9px solid var(--ring-color);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 45px rgba(0, 0, 0, 0.45);
+        border: 8px solid var(--ring-color);
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 44px rgba(0, 0, 0, 0.4);
       }
 
       .wheel-inner {
         position: absolute;
-        inset: 12px;
+        inset: 10px;
         border-radius: 9999px;
         background:
-          radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.2), transparent 28%),
-          radial-gradient(circle at 70% 75%, rgba(59, 130, 246, 0.15), transparent 35%),
-          linear-gradient(160deg, #123757 0%, #081533 68%, #050b1e 100%);
+          radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.2), transparent 30%),
+          linear-gradient(160deg, #123757 0%, #081533 70%, #050b1e 100%);
       }
 
       .wheel-marker {
@@ -60,78 +55,88 @@
         inset: 0;
         display: grid;
         place-items: center;
-        text-align: center;
         z-index: 2;
         pointer-events: none;
       }
-
-      @media (max-width: 640px) {
-        .wheel-shell {
-          width: min(100%, 285px);
-        }
-      }
     </style>
   </head>
-  <body class="app-bg min-h-screen text-slate-100 p-3 sm:p-8">
-    <main class="mx-auto w-full max-w-5xl rounded-3xl border border-slate-700/70 bg-slate-950/70 p-4 sm:p-8 shadow-2xl shadow-black/30">
-      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">fuelvselectric</h1>
-      <p class="mt-2 text-base sm:text-lg text-slate-300">Vergleiche, welcher Strompreis pro kWh dem gewählten Benzinpreis entspricht (und umgekehrt).</p>
+  <body class="app-bg text-slate-100">
+    <main class="h-screen overflow-y-auto snap-y snap-mandatory">
+      <section class="min-h-screen snap-start p-4 flex items-center">
+        <div class="mx-auto w-full max-w-xl rounded-3xl border border-slate-700/70 bg-slate-950/70 p-5 shadow-2xl">
+          <h1 class="text-3xl font-extrabold">fuelvselectric</h1>
+          <p class="mt-1 text-slate-300">Seite 1/3 – Verbrauchsangaben</p>
 
-      <section class="mt-6 grid gap-4 sm:grid-cols-2">
-        <label class="rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
-          <span class="mb-2 block text-xl font-semibold text-slate-200">Benzin-Verbrauch (Liter / 100 km)</span>
-          <div class="flex items-center gap-3">
-            <button type="button" id="fuelMinus" class="h-16 w-16 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95 touch-manipulation">−</button>
-            <input id="fuelConsumption" type="number" min="0" step="0.1" value="9" inputmode="decimal" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-4 text-center text-2xl outline-none focus:border-blue-400" />
-            <button type="button" id="fuelPlus" class="h-16 w-16 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95 touch-manipulation">+</button>
-          </div>
-        </label>
+          <div class="mt-5 space-y-4">
+            <label class="block rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
+              <span class="mb-2 block text-lg font-semibold">Benzin-Verbrauch (Liter / 100 km)</span>
+              <div class="flex items-center gap-3">
+                <button type="button" id="fuelMinus" class="h-16 w-16 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold touch-manipulation">−</button>
+                <input id="fuelConsumption" type="number" min="0" step="0.1" value="9" inputmode="decimal" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-4 text-center text-2xl" />
+                <button type="button" id="fuelPlus" class="h-16 w-16 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold touch-manipulation">+</button>
+              </div>
+            </label>
 
-        <label class="rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
-          <span class="mb-2 block text-xl font-semibold text-slate-200">Stromverbrauch (kWh / 100 km)</span>
-          <div class="flex items-center gap-3">
-            <button type="button" id="electricMinus" class="h-16 w-16 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95 touch-manipulation">−</button>
-            <input id="electricConsumption" type="number" min="0" step="0.01" value="24" inputmode="decimal" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-4 text-center text-2xl outline-none focus:border-emerald-400" />
-            <button type="button" id="electricPlus" class="h-16 w-16 shrink-0 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold text-slate-200 active:scale-95 touch-manipulation">+</button>
+            <label class="block rounded-2xl border border-slate-700 bg-slate-950/50 p-4">
+              <span class="mb-2 block text-lg font-semibold">Stromverbrauch (kWh / 100 km)</span>
+              <div class="flex items-center gap-3">
+                <button type="button" id="electricMinus" class="h-16 w-16 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold touch-manipulation">−</button>
+                <input id="electricConsumption" type="number" min="0" step="0.01" value="24" inputmode="decimal" class="w-full rounded-xl border border-slate-600 bg-slate-900 px-3 py-4 text-center text-2xl" />
+                <button type="button" id="electricPlus" class="h-16 w-16 rounded-xl border border-slate-600 bg-slate-900 text-4xl font-bold touch-manipulation">+</button>
+              </div>
+            </label>
           </div>
-        </label>
+        </div>
       </section>
 
-      <section class="mt-6 grid gap-4 lg:grid-cols-2">
-        <article class="rounded-2xl border border-slate-700/90 bg-slate-950/40 p-5">
-          <h2 class="text-center text-2xl sm:text-4xl font-bold text-slate-200">Benzinpreis pro Liter (€)</h2>
-          <div class="mt-5">
-            <div class="wheel-shell" id="fuelWheel" style="--ring-color: #2f91cc">
-              <div class="wheel-ring"></div>
-              <div class="wheel-inner"></div>
-              <div class="wheel-marker bg-sky-300" id="fuelMarker"></div>
-              <div class="wheel-content">
-                <p class="text-5xl sm:text-7xl font-bold"><span id="fuelPriceLabel">1,70</span> €</p>
-              </div>
-            </div>
-            <p class="mt-3 text-center text-base sm:text-xl text-sky-200">Drehen oder wischen</p>
-          </div>
-          <input id="fuelPrice" class="sr-only" type="range" min="0.8" max="3" step="0.01" value="1.7" />
-        </article>
+      <section class="min-h-screen snap-start p-4 flex items-center">
+        <div class="mx-auto w-full max-w-xl rounded-3xl border border-slate-700/70 bg-slate-950/70 p-5 shadow-2xl">
+          <p class="text-slate-300">Seite 2/3 – Preiseingabe</p>
 
-        <article class="rounded-2xl border border-slate-700/90 bg-slate-950/40 p-5">
-          <h2 class="text-center text-2xl sm:text-4xl font-bold text-slate-200">Strompreis pro kWh (€)</h2>
-          <div class="mt-5">
-            <div class="wheel-shell" id="electricWheel" style="--ring-color: #1f9d82">
-              <div class="wheel-ring"></div>
-              <div class="wheel-inner"></div>
-              <div class="wheel-marker bg-emerald-300" id="electricMarker"></div>
-              <div class="wheel-content">
-                <p class="text-5xl sm:text-7xl font-bold"><span id="electricPriceLabel">0,638</span> €</p>
+          <div class="mt-4 space-y-5">
+            <article class="rounded-2xl border border-slate-700/90 bg-slate-950/40 p-4">
+              <h2 class="text-center text-2xl font-bold">Benzinpreis pro Liter (€)</h2>
+              <div class="mt-3">
+                <div class="wheel-shell" id="fuelWheel" style="--ring-color: #2f91cc">
+                  <div class="wheel-ring"></div>
+                  <div class="wheel-inner"></div>
+                  <div class="wheel-marker bg-sky-300" id="fuelMarker"></div>
+                  <div class="wheel-content">
+                    <p class="text-5xl font-bold"><span id="fuelPriceLabel">1,70</span> €</p>
+                  </div>
+                </div>
+                <p class="mt-2 text-center text-sky-200">Drehen oder wischen</p>
               </div>
-            </div>
-            <p class="mt-3 text-center text-base sm:text-xl text-emerald-200">Drehen oder wischen</p>
+              <input id="fuelPrice" class="sr-only" type="range" min="0.8" max="3" step="0.01" value="1.7" />
+            </article>
+
+            <article class="rounded-2xl border border-slate-700/90 bg-slate-950/40 p-4">
+              <h2 class="text-center text-2xl font-bold">Strompreis pro kWh (€)</h2>
+              <div class="mt-3">
+                <div class="wheel-shell" id="electricWheel" style="--ring-color: #1f9d82">
+                  <div class="wheel-ring"></div>
+                  <div class="wheel-inner"></div>
+                  <div class="wheel-marker bg-emerald-300" id="electricMarker"></div>
+                  <div class="wheel-content">
+                    <p class="text-5xl font-bold"><span id="electricPriceLabel">0,638</span> €</p>
+                  </div>
+                </div>
+                <p class="mt-2 text-center text-emerald-200">Drehen oder wischen</p>
+              </div>
+              <input id="electricPrice" class="sr-only" type="range" min="0.05" max="1.2" step="0.001" value="0.638" />
+            </article>
           </div>
-          <input id="electricPrice" class="sr-only" type="range" min="0.05" max="1.2" step="0.001" value="0.638" />
-        </article>
+        </div>
       </section>
 
-      <p id="result" class="mt-5 rounded-2xl border border-dashed border-slate-600 bg-slate-900/50 px-4 py-3 text-center text-base sm:text-2xl text-slate-200 leading-relaxed"></p>
+      <section class="min-h-screen snap-start p-4 flex items-center">
+        <div class="mx-auto w-full max-w-xl rounded-3xl border border-slate-700/70 bg-slate-950/70 p-5 shadow-2xl">
+          <p class="text-slate-300">Seite 3/3 – Ergebnis</p>
+          <h2 class="mt-2 text-2xl font-bold">Äquivalente Kosten</h2>
+          <p id="result" class="mt-4 rounded-2xl border border-dashed border-slate-600 bg-slate-900/50 px-4 py-4 text-base leading-relaxed"></p>
+          <p class="mt-4 text-slate-300">Tipp: Scrolle vertikal zwischen den drei Seiten. Die Berechnung bleibt immer synchron.</p>
+        </div>
+      </section>
     </main>
 
     <script>
@@ -196,22 +201,18 @@
 
       function setupWheel(wheelEl, rangeEl, onInput) {
         let dragging = false;
-
         wheelEl.addEventListener('pointerdown', (event) => {
           dragging = true;
           wheelEl.setPointerCapture(event.pointerId);
           setValueFromPointer(event, wheelEl, rangeEl, onInput);
         });
-
         wheelEl.addEventListener('pointermove', (event) => {
           if (!dragging) return;
           setValueFromPointer(event, wheelEl, rangeEl, onInput);
         });
-
         const stop = () => {
           dragging = false;
         };
-
         wheelEl.addEventListener('pointerup', stop);
         wheelEl.addEventListener('pointercancel', stop);
       }
@@ -228,7 +229,7 @@
         const costFuel = fuelConsumption * fuelPrice;
         const costElectric = electricConsumption * electricPrice;
 
-        resultEl.textContent = `${format(fuelPrice, 2)} € / Liter bei ${format(fuelConsumption, 1)} l/100 km entspricht ${format(electricPrice, 3)} € / kWh bei ${format(electricConsumption, 2)} kWh/100 km. Kosten je 100 km: ${format(costFuel, 2)} €.`;
+        resultEl.textContent = `${format(fuelPrice, 2)} € / Liter bei ${format(fuelConsumption, 1)} l/100 km entspricht ${format(electricPrice, 3)} € / kWh bei ${format(electricConsumption, 2)} kWh/100 km. Beide ergeben rund ${format(costFuel, 2)} € je 100 km (Strom: ${format(costElectric, 2)} €).`;
 
         positionMarker(fuelMarker, fuelWheel, fuelPriceEl);
         positionMarker(electricMarker, electricWheel, electricPriceEl);
@@ -238,7 +239,6 @@
         const fuelConsumption = toNumber(fuelConsumptionEl.value, 9);
         const electricConsumption = toNumber(electricConsumptionEl.value, 24);
         const fuelPrice = toNumber(fuelPriceEl.value, 1.7);
-
         const equivalentElectric = electricConsumption > 0 ? (fuelConsumption * fuelPrice) / electricConsumption : 0;
         electricPriceEl.value = String(clamp(equivalentElectric, Number(electricPriceEl.min), Number(electricPriceEl.max)));
         render();
@@ -248,7 +248,6 @@
         const fuelConsumption = toNumber(fuelConsumptionEl.value, 9);
         const electricConsumption = toNumber(electricConsumptionEl.value, 24);
         const electricPrice = toNumber(electricPriceEl.value, 0.638);
-
         const equivalentFuel = fuelConsumption > 0 ? (electricConsumption * electricPrice) / fuelConsumption : 0;
         fuelPriceEl.value = String(clamp(equivalentFuel, Number(fuelPriceEl.min), Number(fuelPriceEl.max)));
         render();
@@ -266,7 +265,6 @@
 
       setupWheel(fuelWheel, fuelPriceEl, updateFromFuel);
       setupWheel(electricWheel, electricPriceEl, updateFromElectric);
-
       updateFromFuel();
     </script>
   </body>
